@@ -3,6 +3,7 @@
 #include <SoftwareSerial.h>
 #include "Ultrasonic.h"
 #include "SensorComm.h"
+#include "Timer.h"
 
 const byte type = 1;
 XBeeAddress64 addr64 = XBeeAddress64(0x0013A200, 0x4063AF4F);
@@ -10,24 +11,36 @@ XBeeAddress64 addr64 = XBeeAddress64(0x0013A200, 0x4063AF4F);
 SensorComm scomm(2, 3, type, &addr64);
 
 Ultrasonic ultrasonic(7);
-long RangeInCentimeters;
+long RangeInCm;
+long avgrange = 0;
+byte count = 0;
+
+Timer t100 = Timer(100);
 
 void setup()
 {
   Serial.begin(9600);
   scomm.begin();
+  t100.reset();
   Serial.println(F("Initialized."));
 }
 
 void loop()
 {
-  long RangeInCentimeters;
-  ultrasonic.DistanceMeasure();// get the current signal time;
-  RangeInCentimeters = ultrasonic.microsecondsToCentimeters();//convert the time to centimeters
-  scomm.put(RangeInCentimeters);
-  //Serial.println(F("Time: "));
-  //Serial.println(millis());
-  //Serial.print(RangeInCentimeters);//0~400cm
-  //Serial.println(F(" cm"));
-  delay(500);
+  if (t100.time()) {
+    ultrasonic.DistanceMeasure();
+    RangeInCm = ultrasonic.microsecondsToCentimeters();
+    avgrange += RangeInCm;
+    count++;
+    if (count >= 5) {
+      avgrange = avgrange / 5;
+      scomm.put(avgrange);
+      Serial.println(F("Time: "));
+      Serial.println(millis());
+      Serial.print(avgrange);//30-200
+      Serial.println(F(" cm"));
+      avgrange = 0;
+      count = 0;
+    }
+  }
 }
