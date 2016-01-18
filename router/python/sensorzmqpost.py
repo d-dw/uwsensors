@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+# Temporary POST client used to upload sensor data
 import os
 import time
 import sys
@@ -12,7 +13,7 @@ context = zmq.Context().instance()
 socket = context.socket(zmq.SUB)
 socket.connect("tcp://127.0.0.1:5556")
 socket.setsockopt(zmq.SUBSCRIBE,'')
-print "Connected"
+print "UW Sensor Project Test HTTP POST Client Started"
 
 def signal_handler(signum, frame):
   context.destroy()
@@ -26,7 +27,7 @@ class SensorValues(dict):
     return self[key]
 
 values = SensorValues()
-    
+
 while (not socket.closed):
   for k in values:
     if (len(values[k]) > 99):
@@ -35,12 +36,12 @@ while (not socket.closed):
       resp = urllib2.urlopen(req)
       print "POSTResponse: " + resp.read()
       values[k] = []
-      
+
   try:
     string = socket.recv_string(flags=zmq.NOBLOCK)
     print string
-    sh, v = string.split(' ', 1)
-    values[sh].append(v)
+    header, loc, addr, typ, seq, t, d = string.split(' ', 6)
+    values[loc + typ].append(t + ":" + d)
   except zmq.ZMQError:
     time.sleep(0.01)
     continue
