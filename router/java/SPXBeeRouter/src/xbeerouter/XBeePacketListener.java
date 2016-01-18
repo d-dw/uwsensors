@@ -4,7 +4,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.zeromq.ZMQ;
 
@@ -15,12 +20,15 @@ public class XBeePacketListener implements IPacketReceiveListener {
 	
 	private ZMQ.Context zcontext;
 	private ZMQ.Socket zpub;
+	private Map<String, SensorTime> timingMap = Collections.synchronizedMap(new HashMap<String, SensorTime>());
+	
+	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	public XBeePacketListener() {
 		zcontext = ZMQ.context(1);
 		zpub = zcontext.socket(ZMQ.PUB);
 		zpub.bind("tcp://127.0.0.1:5556");
-		System.out.println("ZMQ Publishing");
+		LOGGER.info("ZMQ Publishing on port 5556");
 	}
 
 	public void packetReceived(XBeePacket packet) {
@@ -34,21 +42,34 @@ public class XBeePacketListener implements IPacketReceiveListener {
 			bb.order(ByteOrder.LITTLE_ENDIAN);
 			byte h1 = bb.get();
 			byte h2 = bb.get();
-			// Skip nonsense packets
+			// Check for magic header bytes
 			if (h1 != 0x6B || h2 != 0x57)
 				return;
 			byte vers = bb.get();
 			byte type = bb.get();
 			IntBuffer ib = bb.asIntBuffer();
-			long seqnum = 0xFFFFFFFFl & (long) ib.get();
-			long startTime = 0xFFFFFFFFl & (long) ib.get();
-			long t = startTime;
+			long seqNum = Integer.toUnsignedLong(ib.get());
+			long sTime = Integer.toUnsignedLong(ib.get());
+			Date t;
+			if (timingMap.containsKey(addr)) {
+				t = timingMap.get(addr).getAndSyncTime(sTime, seqNum);
+			} else {
+				timingMap.put(addr, new SensorTime(sTime, seqNum));
+				t = timingMap.get(addr).getTime(sTime);
+			}
 			while (ib.position() < ib.capacity()) {
-				t += 500;
+				t.setTime(t.getTime() + SensorTime.READING_INTERVAL_MS);
 				int d = ib.get();
-				zpub.send("UWS" + type + " S" + seqnum + "T" + t + ':' + d);
+				StringBuilder sb = new StringBuilder();
+				sb.append("UWSP").append(' ');
+				sb.append("LAB").append(' ');
+				sb.append(type).append(' ');
+				sb.append(seqNum).append(' ');
+				sb.append(t.getTime()).append(' ');
+				sb.append(d);
+				zpub.send(sb.toString());
 				
-				System.out.format("From %s -%ddb >> Seq: %d Time:%d | %dcm%n", addr, rssi, seqnum, t, d);
+				LOGGER.info(String.format("From %s -%ddb >> Seq: %d Time:%d | %dcm%n", addr, rssi, seqNum, t, d));
 			}
 		}
 	}
