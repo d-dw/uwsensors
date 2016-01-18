@@ -63,6 +63,7 @@ public class XBeePacketListener implements IPacketReceiveListener {
 				StringBuilder sb = new StringBuilder();
 				sb.append("UWSP").append(' ');
 				sb.append("LAB").append(' ');
+				sb.append(addr).append(' ');
 				sb.append(type).append(' ');
 				sb.append(seqNum).append(' ');
 				sb.append(t.getTime()).append(' ');
