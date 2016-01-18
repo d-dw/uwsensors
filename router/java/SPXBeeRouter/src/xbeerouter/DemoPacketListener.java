@@ -1,11 +1,9 @@
-package xbeereceiver;
+package xbeerouter;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -19,20 +17,19 @@ import org.zeromq.ZMQ;
 import com.digi.xbee.api.listeners.IPacketReceiveListener;
 import com.digi.xbee.api.packet.XBeePacket;
 
-public class MyDemoPacketListener implements IPacketReceiveListener {
+public class DemoPacketListener implements IPacketReceiveListener {
 	
 	private ZMQ.Context zcontext;
 	private ZMQ.Socket zpub;
 	private String url = "http://www.rkocielnik.com/Business2/upload.php?";
 	
-	public MyDemoPacketListener() {
+	public DemoPacketListener() {
 		zcontext = ZMQ.context(1);
 		zpub = zcontext.socket(ZMQ.PUB);
 		zpub.bind("tcp://127.0.0.1:5556");
 		System.out.println("ZMQ Publishing");
 	}
 
-	@Override
 	public void packetReceived(XBeePacket packet) {
 		// Skip to 11th byte for start of payload
 		byte[] data = Arrays.copyOfRange(packet.getPacketData(), 11, packet.getPacketLength());

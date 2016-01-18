@@ -1,0 +1,3 @@
+[submodule "router/java/XBeeJavaLibrary"]
+	path = router/java/XBeeJavaLibrary
+	url = https://github.com/digidotcom/XBeeJavaLibrary
