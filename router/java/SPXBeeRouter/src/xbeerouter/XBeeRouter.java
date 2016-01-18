@@ -1,4 +1,4 @@
-package xbeereceiver;
+package xbeerouter;
 
 import com.digi.xbee.api.XBeeDevice;
 import com.digi.xbee.api.exceptions.XBeeException;
@@ -7,13 +7,11 @@ import com.digi.xbee.api.exceptions.XBeeException;
  * XBee Receiver for Sensor Project
  * Utilizes XBee Java API
  */
-public class XBeeReceiver {
+public class XBeeRouter {
 	
 	/* Constants */
 	
-	// TODO Replace with the serial port where your receiver module is connected.
 	private static final String PORT = "COM4";
-	// TODO Replace with the baud rate of you receiver module.
 	private static final int BAUD_RATE = 57600;
 
 	/**
@@ -23,16 +21,16 @@ public class XBeeReceiver {
 	 */
 	public static void main(String[] args) {
 		System.out.println(" +-----------------------------------------+");
-		System.out.println(" |  XBeeReceiver for Sensor Project  |");
+		System.out.println(" |  XBeeRouter for UW Sensor Project  |");
 		System.out.println(" +-----------------------------------------+\n");
 		
-		XBeeDevice myDevice = new XBeeDevice(PORT, BAUD_RATE);
+		final XBeeDevice myDevice = new XBeeDevice(PORT, BAUD_RATE);
 		
 		try {
 			System.out.println(myDevice.toString());
 			myDevice.open();
 			
-			XBeePacketListener listener = new XBeePacketListener();
+			final XBeePacketListener listener = new XBeePacketListener();
 			
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				@Override
@@ -43,8 +41,6 @@ public class XBeeReceiver {
 			});
 			
 			myDevice.addPacketListener(listener);
-			//myDevice.addPacketListener(new MyTestPacketListener());
-			//myDevice.addDataListener(new MyDataReceiveListener(myDevice));
 			
 			System.out.println("\n>> Waiting for data...");
 			
