@@ -32,7 +32,7 @@ void SensorComm::put(long data)
 {
   packetsbuf[packetptr].data[dataptr++] = data;
   // Check if packet is full of data
-  if (dataptr > MAXDATAPTR) {
+  if (dataptr >= MAXDATAPTR) {
     //Serial.println("Filled a packet!");
     dataptr = 0;
     // Increase packet pointer and check if max has been reached
@@ -77,9 +77,9 @@ int SensorComm::sendAtCommand(AtCommandRequest* atReq, AtCommandResponse* atResp
     // at command failed
     if (xbee.getResponse().isError()) {
       return 1;
-    } 
+    }
     else {
-      return 2; 
+      return 2;
     }
   }
   return 0;

@@ -2,7 +2,7 @@
 #define SENSORCOMM_H
 
 const int MAXPACKETPTR = 9;
-const int MAXDATAPTR = 21;
+const int MAXDATAPTR = 22;
 const int RADIODTRPIN = 9;
 
 // 100 Byte XB Packet
@@ -14,7 +14,7 @@ typedef struct XBPacket {
   byte type;
   unsigned long seqnum;
   unsigned long stime;
-  long data[22];
+  long data[MAXDATAPTR];
 } XBPacket;
 
 class SensorComm
@@ -28,7 +28,7 @@ class SensorComm
     XBee xbee;
     const byte _type;
     XBeeAddress64* daddr;
-    XBPacket packetsbuf[9];
+    XBPacket packetsbuf[MAXPACKETPTR];
     XBeeAddress64 destaddr;
     int packetptr;
     int dataptr;
