@@ -1,4 +1,4 @@
-package xbeereceiver;
+package xbeerouter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -23,7 +23,6 @@ public class XBeePacketListener implements IPacketReceiveListener {
 		System.out.println("ZMQ Publishing");
 	}
 
-	@Override
 	public void packetReceived(XBeePacket packet) {
 		// Skip to 11th byte for start of payload
 		byte[] data = Arrays.copyOfRange(packet.getPacketData(), 11, packet.getPacketLength());
