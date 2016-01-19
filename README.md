@@ -10,9 +10,13 @@ The initial goal for this project is to help small-business owners collect spati
 
 All embedded sensor code and gateway code is currently organized in this single repository. 
 
-* router: Router contains code for the central coodinating gateway (in Java) and initial processing pipeline (in Python). All TCP networking is implemented using ZeroMQ.
+* router: Router contains code for the central coodinating gateway (in Java) and initial processing pipeline (in Python). All TCP networking is implemented using ZeroMQ. Current deployment target is Raspberry Pi 2.
 * sensor_devices: Sensor Devices contains code for the various types of individual sensors (in C++).
 
-## Compilation and Instllation
+## Wiring Diagrams and Radio Configuration
+
+* TODO
+
+## Compilation and Installation
 
 * TODO
