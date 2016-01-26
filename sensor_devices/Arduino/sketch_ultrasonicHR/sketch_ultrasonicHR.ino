@@ -28,6 +28,7 @@ void setup()
 void loop()
 {
   if (t100.time()) {
+    unsigned long t = millis();
     ultrasonic.DistanceMeasure();
     RangeInCm = ultrasonic.microsecondsToCentimeters();
     avgrange += RangeInCm;
@@ -36,7 +37,7 @@ void loop()
       avgrange = avgrange / 5;
       scomm.put(avgrange);
       Serial.println(F("Time: "));
-      Serial.println(millis());
+      Serial.println(t);
       Serial.print(avgrange);//30-200
       Serial.println(F(" cm"));
       avgrange = 0;

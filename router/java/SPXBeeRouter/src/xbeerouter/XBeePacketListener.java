@@ -3,6 +3,7 @@ package xbeerouter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +33,7 @@ public class XBeePacketListener implements IPacketReceiveListener {
 	}
 
 	public void packetReceived(XBeePacket packet) {
+		LOGGER.info("GOT A PACKET");
 		// Skip to 11th byte for start of payload
 		byte[] data = Arrays.copyOfRange(packet.getPacketData(), 11, packet.getPacketLength());
 		LinkedHashMap<String, String> params = packet.getParameters();
@@ -69,8 +71,9 @@ public class XBeePacketListener implements IPacketReceiveListener {
 				sb.append(t.getTime()).append(' ');
 				sb.append(d);
 				zpub.send(sb.toString());
-				
-				LOGGER.info(String.format("From %s -%ddb >> Seq: %d Time:%d | %dcm%n", addr, rssi, seqNum, t, d));
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyy-MM-dd hh:mm:ss");
+				String out = String.format("From %s -%ddb >> Seq: %d Time:%s | %dcm%n", addr, rssi, seqNum, sdf.format(t), d);
+				LOGGER.info(out);
 			}
 		}
 	}
