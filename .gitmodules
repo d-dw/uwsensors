@@ -1,3 +1,9 @@
 [submodule "router/java/XBeeJavaLibrary"]
 	path = router/java/XBeeJavaLibrary
 	url = https://github.com/digidotcom/XBeeJavaLibrary
+[submodule "sensor_devices/Arduino/libraries/SharpIR_library"]
+	path = sensor_devices/Arduino/libraries/SharpIR_library
+	url = https://github.com/guillaume-rico/SharpIR
+[submodule "sensor_devices/Arduino/libraries/XBee-Arduino_library"]
+	path = sensor_devices/Arduino/libraries/XBee-Arduino_library
+	url = https://github.com/andrewrapp/xbee-arduino
