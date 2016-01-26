@@ -13,7 +13,7 @@ public class XBeeRouter {
 	
 	/* Constants */
 	
-	private static final String PORT = "COM4";
+	private static final String PORT = "/dev/tty.usbserial-A403JW2C";
 	private static final int BAUD_RATE = 57600;
 	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -42,7 +42,7 @@ public class XBeeRouter {
 			
 			xbDevice.addPacketListener(listener);
 			
-			LOGGER.info("\n>> Waiting for data...");
+			LOGGER.info(">> Waiting for data...");
 			
 		} catch (XBeeException e) {
 			LOGGER.severe(e.getLocalizedMessage());

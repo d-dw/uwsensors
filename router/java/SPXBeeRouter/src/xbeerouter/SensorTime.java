@@ -4,20 +4,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
 
+/*
+ * SensorTime attempts to calculate the start time of individual sensors
+ * and syncs that time with the system time, assumed to be accurate.
+ * 
+ * TODO: Does not detect millisecond overflows of the sensors, as currently 
+ * battery will run out long before the overflow of ~60 days.
+ */
 public class SensorTime {
 	public static final int MAX_PKT_BUF = 9;
 	public static final int READINGS_PER_PKT_LONGS = 22;
 	public static final int READING_INTERVAL_MS = 500;
 	
 	private Date startTime;
-	private Boolean roughTime;
 	private long seqNum;
 	
 	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	public SensorTime(long sTime, long seqNum) {
 		initialSync(sTime, seqNum);
-		this.seqNum = seqNum;
 	}
 	
 	public synchronized Date getTime(long sTime) {
@@ -30,40 +35,21 @@ public class SensorTime {
 			initialSync(sTime, seqNum);
 			return new Date(startTime.getTime() + sTime);
 		}
-		incrementalSync(sTime);
+		this.seqNum = seqNum;
 		return new Date(startTime.getTime() + sTime);
 	}
 	
 	private void initialSync(long sTime, long seqNum) {
 		Calendar now = Calendar.getInstance();
-		if (seqNum < 10) {
-			now.add(Calendar.MINUTE, -2);
+		if (seqNum < 9) {
+			now.add(Calendar.MILLISECOND, -(MAX_PKT_BUF * READINGS_PER_PKT_LONGS * READING_INTERVAL_MS));
 			startTime = now.getTime();
-			roughTime = true;
 		} else {
 			LOGGER.warning("Started receiving late readings from previously unknown sensor!");
-			now.setTimeInMillis(now.getTimeInMillis() - (2000 * seqNum));
+			now.setTimeInMillis(now.getTimeInMillis() - (READINGS_PER_PKT_LONGS * READING_INTERVAL_MS * seqNum));
 			startTime = now.getTime();
-			roughTime = true;
 		}
-	}
-	
-	private void incrementalSync(long sTime) {
-		Calendar now = Calendar.getInstance();
-		Date newStartTime = new Date(
-				now.getTimeInMillis() - 
-				sTime - 
-				(READINGS_PER_PKT_LONGS * READING_INTERVAL_MS)
-				);
-		if (roughTime) {
-			startTime = newStartTime;
-			roughTime = false;
-		} else {
-			Date avgStartTime = new Date(startTime.getTime() + 
-					((newStartTime.getTime() - startTime.getTime()) / 2)
-					);
-			startTime = avgStartTime;
-		}
+		this.seqNum = seqNum;
 	}
 
 }

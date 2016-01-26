@@ -7,7 +7,12 @@ Timer::Timer(unsigned long delay) {
 }
 
 bool Timer::time() {
-  return (millis() - _t0) >= _delay;
+  unsigned long now = millis();
+  if (now - _t0 >= _delay) {
+    _t0 = now;
+    return true;
+  }
+  return false;
 }
 
 void Timer::reset() {
