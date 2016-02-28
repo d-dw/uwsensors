@@ -6,10 +6,9 @@
 #include "SensorComm.h"
 #include "Timer.h"
 
-const byte type = 3;
 XBeeAddress64 addr64 = XBeeAddress64(0x0013A200, 0x40DAF053);
 
-SensorComm scomm(2, 3, type, &addr64);
+SensorComm scomm(2, 3, TYPE_IR_SHARP, &addr64);
 
 SharpIR SharpIR(A0, 20150);
 long rangemm;
