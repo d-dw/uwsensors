@@ -5,11 +5,10 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.zeromq.ZMQ;
@@ -21,7 +20,7 @@ public class XBeePacketListener implements IPacketReceiveListener {
 	
 	private ZMQ.Context zcontext;
 	private ZMQ.Socket zpub;
-	private Map<String, SensorTime> timingMap = Collections.synchronizedMap(new HashMap<String, SensorTime>());
+	private Map<String, SensorTime> timingMap = new ConcurrentHashMap<String, SensorTime>();
 	
 	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
@@ -78,7 +77,7 @@ public class XBeePacketListener implements IPacketReceiveListener {
 		}
 	}
 	
-	public void closeSocket() {
+	public void closeZMQSocket() {
 		zpub.close();
 		zcontext.term();
 	}

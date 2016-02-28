@@ -5,10 +5,9 @@
 #include "SensorComm.h"
 #include "Timer.h"
 
-const byte type = 2;
 XBeeAddress64 addr64 = XBeeAddress64(0x0013A200, 0x40DAF053);
 
-SensorComm scomm(2, 3, type, &addr64);
+SensorComm scomm(2, 3, TYPE_ULTRASONIC_LV, &addr64);
 
 UltrasonicLV ultrasonic(7);
 long RangeInInches;
