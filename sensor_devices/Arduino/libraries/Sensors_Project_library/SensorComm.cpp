@@ -47,9 +47,10 @@ void SensorComm::put(long data)
       for (int i = 0; i < MAXPACKETPTR + 1; i++) {
         tx = Tx64Request(*daddr, (uint8_t *)&packetsbuf[i], sizeof(XBPacket));
         xbee.send(tx);
+        delay(50);
+        recvCommandPkt();
         //Serial.println("tx sent");
       }
-      // Receive commands if any
       recvCommandPkt();
       // Put radio to sleep to save power
       digitalWrite(RADIODTRPIN, HIGH);
@@ -77,8 +78,8 @@ void SensorComm::setupPacket() {
 }
 
 int SensorComm::recvCommandPkt() {
-  xbee.readPacket();
-  if (xbee.getResponse().isAvailable()) {
+  xbee.readPacket(1000);
+  while (xbee.getResponse().isAvailable()) {
     XBCommandPacket* cmdPkt;
     if (xbee.getResponse().getApiId() == RX_16_RESPONSE) {
       Rx16Response resp;
@@ -97,6 +98,7 @@ int SensorComm::recvCommandPkt() {
         return COMMAND_SLEEP;
       }
     }
+    xbee.readPacket();
   }
   return 0;
 }

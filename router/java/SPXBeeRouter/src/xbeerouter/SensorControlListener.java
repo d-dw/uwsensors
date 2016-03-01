@@ -35,6 +35,7 @@ public class SensorControlListener implements IPacketReceiveListener {
 		if (params.get("Frame type").contains("80")) {
 			if (sSchedule.closed()) {
 				String addr = params.get("64-bit source address");
+				addr = addr.replaceAll("\\s+", "");
 				ByteBuffer bb = ByteBuffer.wrap(data);
 				bb.order(ByteOrder.LITTLE_ENDIAN);
 				byte h1 = bb.get();
@@ -49,18 +50,15 @@ public class SensorControlListener implements IPacketReceiveListener {
 				long sTime = Integer.toUnsignedLong(ib.get());
 				// Skip sleep packet if we already sent it during this round
 				if (lastCommandSeqnum.containsKey(addr) &&
-						seqNum - lastCommandSeqnum.get(addr) < SensorTime.MAX_PKT_BUF)
+						Math.abs(seqNum - lastCommandSeqnum.get(addr)) < SensorTime.MAX_PKT_BUF)
 					return;
 				
 				byte[] cmdPkt = createSleepCommandPacket(sSchedule.timeToOpen());
 				RemoteXBeeDevice sensorXB = new RemoteXBeeDevice(xbDevice, new XBee64BitAddress(addr));
 				try {
-					xbDevice.sendData(sensorXB, cmdPkt);
+					xbDevice.sendDataAsync(sensorXB, cmdPkt);
 					lastCommandSeqnum.put(addr, seqNum);
 					LOGGER.info("Sleep packet sent to " + addr);
-				} catch (TimeoutException e) {
-					LOGGER.warning("Timeout sending sleep to " + addr);
-					LOGGER.warning(e.getLocalizedMessage());
 				} catch (XBeeException e) {
 					LOGGER.warning("XBeeException when sending sleep to " + addr);
 					LOGGER.warning(e.getLocalizedMessage());
