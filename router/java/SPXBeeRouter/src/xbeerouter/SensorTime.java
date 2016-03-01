@@ -46,7 +46,7 @@ public class SensorTime {
 			startTime = now.getTime();
 		} else {
 			LOGGER.warning("Started receiving late readings from previously unknown sensor!");
-			now.setTimeInMillis(now.getTimeInMillis() - (READINGS_PER_PKT_LONGS * READING_INTERVAL_MS * seqNum));
+			now.setTimeInMillis(now.getTimeInMillis() - sTime - (MAX_PKT_BUF * READINGS_PER_PKT_LONGS * READING_INTERVAL_MS));
 			startTime = now.getTime();
 		}
 		this.seqNum = seqNum;
