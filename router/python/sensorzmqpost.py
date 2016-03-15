@@ -32,6 +32,7 @@ while (not socket.closed):
   for k in values:
     if (len(values[k]) > 99):
       postdata = {"sensor_id":k, "value":values[k]}
+      #print(postdata)
       req = urllib2.Request("upload_post.php", urllib.urlencode(postdata))
       resp = urllib2.urlopen(req)
       print "POSTResponse: " + resp.read()
@@ -41,7 +42,7 @@ while (not socket.closed):
     string = socket.recv_string(flags=zmq.NOBLOCK)
     print string
     header, loc, addr, typ, seq, t, d = string.split(' ', 6)
-    values[loc + typ].append(t + ":" + d)
+    values[loc + addr].append(t + ":" + d)
   except zmq.ZMQError:
     time.sleep(0.01)
     continue

@@ -39,6 +39,7 @@ public class XBeePacketListener implements IPacketReceiveListener {
 		if (params.get("Frame type").contains("80")) {
 			int rssi = Integer.parseInt(params.get("RSSI"), 16);
 			String addr = params.get("64-bit source address");
+			addr = addr.replaceAll("\\s+", "");
 			ByteBuffer bb = ByteBuffer.wrap(data);
 			bb.order(ByteOrder.LITTLE_ENDIAN);
 			byte h1 = bb.get();

@@ -29,13 +29,19 @@ public class XBeeRouter {
 	public static void main(String[] args) {
 		System.out.println("Initializing XBeeRouter for UW Sensor Project");
 		
+		boolean schedule = false;
 		SiteSchedule sSchedule = null;
 		try {
 			FileInputStream in = new FileInputStream(args[0]);
 			Properties props = new Properties();
 			props.load(in);
 			in.close();
-			sSchedule = new SiteSchedule(props);
+			if (props.getProperty("schedule").compareTo("true") == 0) {
+				LOGGER.info("Loading schedule...");
+				schedule = true;
+				sSchedule = new SiteSchedule(props);
+			}
+			
 		} catch (FileNotFoundException e) {
 			LOGGER.severe("No properties file provided. Quitting.");
 			System.exit(1);
@@ -51,10 +57,11 @@ public class XBeeRouter {
 			xbDevice.open();
 			
 			final XBeePacketListener listener = new XBeePacketListener();
-			final SensorControlListener controlListener = new SensorControlListener(sSchedule, xbDevice);
-			
 			xbDevice.addPacketListener(listener);
-			xbDevice.addPacketListener(controlListener);
+			if (schedule) {
+				final SensorControlListener controlListener = new SensorControlListener(sSchedule, xbDevice);
+				xbDevice.addPacketListener(controlListener);
+			}
 			
 			LOGGER.info(">> Waiting for data...");
 			
