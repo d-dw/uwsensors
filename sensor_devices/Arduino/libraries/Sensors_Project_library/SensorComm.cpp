@@ -37,14 +37,14 @@ void SensorComm::put(long data)
     //Serial.println("Filled a packet!");
     dataptr = 0;
     // Increase packet pointer and check if max has been reached
-    if (++packetptr == MAXPACKETPTR) {
+    if (++packetptr >= MAXPACKETPTR) {
       // Send packets if buffer full
       Tx64Request tx;
       // Wake up radio
       digitalWrite(RADIODTRPIN, LOW);
       // Radio takes 20ms to wake up
       delay(20);
-      for (int i = 0; i < MAXPACKETPTR + 1; i++) {
+      for (int i = 0; i < MAXPACKETPTR; i++) {
         tx = Tx64Request(*daddr, (uint8_t *)&packetsbuf[i], sizeof(XBPacket));
         xbee.send(tx);
         delay(50);

@@ -41,7 +41,7 @@ public class SensorTime {
 	
 	private void initialSync(long sTime, long seqNum) {
 		Calendar now = Calendar.getInstance();
-		if (seqNum < 9) {
+		if (seqNum < MAX_PKT_BUF) {
 			now.add(Calendar.MILLISECOND, -(MAX_PKT_BUF * READINGS_PER_PKT_LONGS * READING_INTERVAL_MS));
 			startTime = now.getTime();
 		} else {
